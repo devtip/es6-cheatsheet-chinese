@@ -1,8 +1,6 @@
 # ES6手抄
-@(ES6笔记)[es6,es2015,es6入门]
 
-这份笔记包含ES2015 [ES6] 提示, 技巧, 最佳实践 和一些你日常工作常用的代码片段. 欢迎贡献！本文尽量保留原作者的意思，标记为＂ps:＂都是个人的理解，当然也有一些翻译不到位的地方，望请见谅！
-
+> 这份手抄包含ES2015 [ES6]的使用提示, 技巧, 最佳实践 和以及一些常用代码片段. 欢迎贡献！本文尽量保留原作者的意思，标记为＂ps:＂都是个人的理解，当然也有一些翻译不到位的地方，望请见谅！
 
 
 - 译者：[＠devtip](https://github.com/devtip/)
@@ -11,12 +9,6 @@
 - pdf版本请点击[这里](http://pan.baidu.com/s/1qXtFQPI)前往百度网盘
 
 
-
-------------------------
-
-[TOC]
-
--------------------------
 
 ## var 对比 let / const
 
@@ -52,7 +44,7 @@ function getFood(food) {
         let snack = 'Friskies';
         return snack;
     }
-    // 当food为false时，它只能从上一级作用域，直到全局作用域进行查找
+    // 当food为false时，它只能从上一级作用域查找变量snack，这个过程一直延伸到"全局作用域"
     return snack;
 }
 
@@ -60,22 +52,22 @@ getFood(false); // 'Meow Mix'
 ```
 
 
-当重构代码时候，特别要小心那些使用**var**的代码！盲目地使用**let**代替**var**将会产生意想不到的行为！
+当重构遗留代码的时候，特别要小心那些使用**var**的代码！盲目地使用**let**代替**var**将会产生意想不到的行为！
 
 
-> **注意**: **let** 和　**const**都是块级作用域的. 因此，块级作用域的标识符在定义之前就被引用，将会产生`ReferenceError`.
+> **注意**: **let** 和**const**都是块级作用域的. 因此，块级作用域的标识符在定义之前就被引用，将会产生`ReferenceError`(引用错误)
 
 ```javascript
 console.log(x);
 let x = "hi";   // 引用错误: x还没有定义
 ```
 
-> **最佳实践**: 在遗留代码中保留**var**声明，以表示这段代码重构需要慎重考虑！党我们在一个新的代码库中工作时，使用**let**声明的变量，将会随着时间的推移发生改变，以及**const**声明的变量，通常并不会改变！（实质上，使用const声明的变量只有＂只读＂状态）
+> **最佳实践**: 在遗留代码中保留**var**声明的语句，以表示这段代码重构需要慎重考虑！当我们在一个新的代码库中工作时，使用**let**声明的变量，将会随着时间的推移发生改变，以及**const**声明的变量，通常并不会改变！（ps: 实质上，使用const声明的变量只有＂只读＂状态）
 
 
 ## 使用语句块替换IIFE
 
-> **自调用函数表达式**的常见用途是将变量封装在其作用域．ES6提供了一种创建块级作用域的能力，因此，我们不在单纯局限于函数作用域！
+> **自调用函数表达式**的常见用途是将变量封装在其作用域！ES6提供了一种创建**块级作用域**的能力，因此，我们不在单纯局限于函数作用域！
 
 ```javascript
 (function () {
@@ -104,12 +96,13 @@ function Person(name) {
 
 Person.prototype.prefixName = function (arr) {
     return arr.map(function (character) {
+      // ps: this被绑定到全局对象，严格模式this被绑定到undefined
         return this.name + character; // 不能从undefined读取到name属性
     });
 };
 ```
 
-一个比较普遍的解决方案是通过一个变量，（通常是that）来当前上下文的**this**
+一个比较普遍的解决方案是通过一个变量（ps:通常是that）来存储当前上下文的**this**
 
 ```javascript
 function Person(name) {
@@ -124,7 +117,8 @@ Person.prototype.prefixName = function (arr) {
 };
 ```
 
-我们可以为数组的map方法传入一个适当的上下文`this`:
+我们可以为数组的map方法传入一个适当的上下文`this`作为map方法的参数:
+
 ```javascript
 function Person(name) {
     this.name = name;
@@ -133,7 +127,7 @@ function Person(name) {
 Person.prototype.prefixName = function (arr) {
     return arr.map(function (character) {
         return this.name + character;
-    }, this);
+    }, /* 上下文 */this);
 }
 ```
 
@@ -147,11 +141,11 @@ function Person(name) {
 Person.prototype.prefixName = function (arr) {
     return arr.map(function (character) {
         return this.name + character;
-    }.bind(this));
+    }.bind(/* 上下文 */this));
 }
 ```
 
-使用**箭头函数**,词法作用域中**this**并没有变得很神秘，重写上面的代码（this已经进行了正确的绑定）:
+使用**箭头函数**,词法作用域中**this**并没有变得很神秘，重写上面的代码（ps: this已经进行了正确的绑定）:
 
 ```javascript
 function Person(name) {
@@ -192,7 +186,7 @@ var substring = 'foo';
 console.log(string.indexOf(substring) > -1);
 ```
 
-当字符串是包含关系，将会返回一个`> -1`的值，我们可以简单地使用 **.includes()**取代这种操作，并且**.includes()**将会返回一个布尔(boolean)值：
+当字符串之间是包含关系，将会返回一个`> -1`的值，我们可以简单地使用 **.includes()**取代这种操作，并且**.includes()**将会返回一个布尔(boolean)值：
 
 ```javascript
 const string = 'food';
@@ -246,7 +240,7 @@ const age = 13;
 console.log(`My cat is named ${name} and is ${age} years old.`);
 ```
 
-在ES5,我们通常就想下面这样处理新行:
+在ES5,我们通常就想下面这样处理新行(new line):
 ```javascript
 var text = (
   'cat\n' +
@@ -255,7 +249,7 @@ var text = (
 )
 ```
 
-或者:
+或者(通过数组的join()方法来实现):
 
 ```javascript
 var text = [
@@ -265,7 +259,7 @@ var text = [
 ].join('\n')
 ```
 
-**模板字面量** 会为我们保留新行而无需显式对它们进行上面的操作:
+**模板字面量** 会为我们保留新行(new line)无需显式对它们进行上面的操作:
 
 ```javascript
 let text = ( `cat
@@ -429,14 +423,15 @@ import * as additionUtil from 'math/addtion';
 const { sumTwo, sumThree } = additionUtil;
 ```
 
-当我们导入默认的对象(这里值得是Ｒeact)，我们甚至可以选择性地这个对象的一些方法(React.Component): 
+当我们导入默认的对象(这里指得是Ｒeact)，我们甚至可以选择性地导入这个对象的一些方法(React.Component): 
 
 ```javascript
 import React from 'react';
 const { Component, PropTypes } = React;
 ```
 
->**注意**：模块暴露的值是**绑定**关系，而不是引用关系。因此，改变模块这种＂绑定＂关系，会影响所导出模块内的值。避免更改这些模块暴露出来的公共接口。
+> **注意**：模块暴露的值是**绑定**关系，而不是引用关系。因此，改变模块这种＂绑定＂关系，会影响所有依赖这些导出模块内的值。避免更改这些模块暴露出来的公共接口。(ps: 这里比较难理解)
+
 
 ## 参数
 
@@ -466,7 +461,7 @@ addTwoNumbers(2); // 2
 addTwoNumbers(); // 0
 ```
 
-### 其余参数
+### （Rest）其余参数
 
 在ES5，我们经常像下面那样处理＂函数参数数量不确定＂的情况：
 
@@ -488,7 +483,7 @@ function logArguments(...args) {
 }
 ```
 
-### 命名参数
+### 命名参数(Named Parameters)
 
 ES5中，一个处理"命名参数"的常用模式是**可配置对象**模式，这种模式在jQuery中广泛使用!
 
@@ -510,7 +505,7 @@ function initializeCanvas(
     // Use variables height, width, lineStroke here
 ```
 
-如果我们想整个值都是可配置(PS:可选)的，我们"解构"一个空的对象:
+如果我们想整个值都是可配置(ps: 可选)的，我们可以"解构"一个空的对象:
 
 
 ```javascript
@@ -522,9 +517,9 @@ function initializeCanvas(
 
 ### Spread操作符
 
-我们可以使用spread操作符向函数传递一个数组，而这个数组的值作为函数参数来使用,(比如获取数组的最大值):
+我们可以使用spread操作符向函数传递一个数组，而这个数组的值作为函数参数来使用(ps: 比如获取数组的最大值):
 ``` javascript
-// ES5
+// ps: ES5
 Math.max(-1, 100, 9001, -32) // 9001
 Math.max.apply(null, [-1, 100, 9001, -32]) // 9001
 ```
@@ -582,11 +577,12 @@ class Person {
 }
 ```
 
-:-( 
 使用**extends**关键字来继承父类(PS:这里值得是Ｐerson)
 
 ```javascript
+//  使用extends继承Person父类
 class Personal extends Person {
+  // ps: 构造函数
     constructor(name, age, gender, occupation, hobby) {
       super(name, age, gender);
       this.occupation = occupation;
@@ -616,14 +612,14 @@ const object = {};
 object[key] = 'Such magic.';
 object[keyTwo] = 'Much Uniqueness'
 
-// Two Symbols will never have the same value
+// 两个Symbols之间永不会有相同的值
 >> key === keyTwo
 >> false
 ```
 
 ## Maps(映射)
 
-**Maps**在JavaScript中是非常有用的数据结构.ES6之前, 我们通过对象来创建**hash** maps来实现相同的目标:
+**Maps**在JavaScript中是非常有用的数据结构！ES6之前, 我们通过对象来创建**hash(哈希)** maps来实现相同的目标:
 
 ```javascript
 var map = new Object();
@@ -641,7 +637,7 @@ map[key2] = 'value2';
 ```
 
 
-实际上，**Maps**允许我们**set(设置)**, **get(获取)*和 **search(查找)**值，甚至为我们提供更多的功能.
+实际上，**Maps**允许我们**set(设置)**, **get(获取)**和 **search(查找)**值，甚至为我们提供更多的功能.
 
 ```javascript
 let map = new Map();
@@ -650,7 +646,7 @@ let map = new Map();
 > map.has('name'); // true
 ```
 
-Ｍaps的最令人震惊的部分是，我们不再局限于使用字符串。现在，我们可以使用任何类型作为键，并且它不会被类型转换为字符串(ps:对象的所有键都是字符串类型!)
+Ｍaps的最令人震惊的部分是，我们不再局限于使用字符串(作为对象的属性) . 现在，我们可以使用任何类型作为键，并且它不会被类型转换为字符串(ps:对象的所有键都是字符串类型!)
 
 ``` javascript
 // ps:
@@ -674,7 +670,7 @@ for (let key of map.keys()) {
 ```
 
 
-> **注意**：使用非基本数据类型(比如函数或对象)将会导致`map.get()`方法测试相等性问题时无法正常地工作。因此，坚持使用基本数据类型，如字符串，布尔和数字。(ps:Sorry，没看懂这段话意图的！)
+> **注意**：使用非基本数据类型(比如函数或对象)将会导致`map.get()`方法测试相等性问题时无法正常地工作。因此，坚持使用基本数据类型，如字符串，布尔和数字。(ps:Sorry，没看懂这段话的意思！)
 
 我们可以通过**.entries( )**来遍历整个map:
 
