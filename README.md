@@ -5,10 +5,10 @@
 
 
 
-译者：[＠devtip](https://github.com/devtip/)
-翻译日期: 2016-01-27
-原文地址: https://github.com/DrkSephy/es6-cheatsheet
-pdf版本请点击[这里](http://pan.baidu.com/s/1qXtFQPI)前往百度网盘
+- 译者：[＠devtip](https://github.com/devtip/)
+- 翻译日期: 2016-01-27
+- 原文地址: https://github.com/DrkSephy/es6-cheatsheet
+- pdf版本请点击[这里](http://pan.baidu.com/s/1qXtFQPI)前往百度网盘
 
 
 
