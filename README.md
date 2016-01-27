@@ -104,12 +104,11 @@ function Person(name) {
 
 Person.prototype.prefixName = function (arr) {
     return arr.map(function (character) {
-        return this.name + character; // Cannot read property 'name' of undefined（不能从undefined读取到name属性）
+        return this.name + character; // 不能从undefined读取到name属性
     });
 };
 ```
 
-One common solution to this problem is to store the context of **this** using a variable:
 一个比较普遍的解决方案是通过一个变量，（通常是that）来当前上下文的**this**
 
 ```javascript
